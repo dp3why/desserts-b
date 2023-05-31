@@ -22,7 +22,6 @@ jobs:
       - name: Configure AWS CLI
         run: |
           mkdir ~/.aws
-          mkdir ~/.aws/config
           echo "[default]" > ~/.aws/config
           echo "region = ${{ env.AWS_REGION }}" >> ~/.aws/config
 

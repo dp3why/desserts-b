@@ -8,6 +8,7 @@ from app.controllers.auth_controller import auth_blueprint
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -24,7 +25,8 @@ def create_app():
 # Initialize the Flask app
 app = create_app()
 
-cred = credentials.ApplicationDefault()
+secret = json.loads(os.getenv('CREDENTIAL'))
+cred = credentials.Certificate(secret)
 firebase_admin.initialize_app(cred, {
  'projectId': os.getenv('PROJECT_ID')
     })
@@ -33,11 +35,3 @@ firebase_admin.initialize_app(cred, {
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 cors = CORS(app)
-
-#     The create_app() function is defined to create and configure the Flask app.
-#     The app instance is created using Flask(__name__).
-#     The file_blueprint is imported from the file_controller.py module(assuming it's defined there). It represents the blueprint for the file-related routes.
-#     The blueprint is registered with the app using app.register_blueprint(file_blueprint).
-#     The app instance is returned from the create_app() function.
-
-# By structuring your code in this way, you can easily add more blueprints or routes to the __init__.py file and keep your application well-organized.

@@ -1,11 +1,13 @@
 from flask import Blueprint, jsonify, request
 from app.services.file_service import upload_file_to_s3
-from app.models.file_model import save_file_url_to_mongodb
+from app.models.file_model import *
+from flask_jwt_extended import jwt_required
 
 file_blueprint = Blueprint('file', __name__)
 
 
 @file_blueprint.route('/upload', methods=['POST'])
+@jwt_required()
 def upload_file():
     if 'file' not in request.files:
         return jsonify(error='No file part'), 400
@@ -27,5 +29,15 @@ def upload_file():
         message='File uploaded successfully',
         filename=file.filename,
         username=username,
-        file_url=file_url
+        url=file_url
     ), 200
+
+
+@file_blueprint.route('/files', methods=['GET'])
+@jwt_required()
+def get_files():
+
+    files = get_all_files_from_mongodb()
+    if files:
+        return jsonify(files)
+    return []

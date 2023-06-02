@@ -1,5 +1,6 @@
 from flask import request, jsonify, Blueprint
-from flask_jwt_extended import  create_access_token, jwt_required, get_jwt_identity
+from datetime import timedelta
+from flask_jwt_extended import  create_access_token
 from firebase_admin import auth
 from flask_cors import cross_origin
 
@@ -17,8 +18,9 @@ def login():
         # Get the user's UID from the decoded token
         user_id = decoded_token['uid']
 
+        expires_delta = timedelta(days=1)
         # Generate JWT token using Firebase UID as the identity
-        access_token = create_access_token(identity=user_id)
+        access_token = create_access_token(identity=user_id, expires_delta=expires_delta)
         return jsonify({'access_token': access_token}), 200
 
     except auth.InvalidIdTokenError or auth.ExpiredIdTokenError or auth.RevokedIdTokenError:

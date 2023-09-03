@@ -3,7 +3,7 @@ from botocore.exceptions import  ClientError
 import logging
 import os
 
-S3_BUCKET_NAME = 'nf-userdata'
+S3_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
 S3_FOLDER_NAME = 'user_images'
 
 def upload_file_to_s3(file ):

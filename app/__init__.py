@@ -8,7 +8,10 @@ from app.controllers.auth_controller import auth_blueprint
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
+import boto3
+from botocore.exceptions import ClientError
 import json
+
 
 load_dotenv()
 
@@ -25,8 +28,37 @@ def create_app():
 # Initialize the Flask app
 app = create_app()
 
-secret = json.loads(os.getenv('CREDENTIAL'))
+
+def get_secret():
+
+    secret_name = "CREDENTIAL"
+    region_name = "us-west-2"
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        # For a list of exceptions thrown, see
+        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
+        raise e
+
+    # Decrypts secret using the associated KMS key.
+    secret = get_secret_value_response['SecretString']
+
+    return json.loads(secret)
+
+
+secret = get_secret()
 cred = credentials.Certificate(secret)
+
 firebase_admin.initialize_app(cred, {
  'projectId': os.getenv('PROJECT_ID')
     })

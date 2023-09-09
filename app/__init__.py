@@ -57,6 +57,7 @@ def get_secret():
 
 
 secret = get_secret()
+
 cred = credentials.Certificate(secret)
 
 firebase_admin.initialize_app(cred, {
